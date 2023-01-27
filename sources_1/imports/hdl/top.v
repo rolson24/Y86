@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module top(
+module top(         // need to integrate buffer perhaps
     input  clk,     // board clk
     input  PS2Data, // keyboard data
     input  PS2Clk,  // keyboard clk
