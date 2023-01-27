@@ -27,9 +27,9 @@ module keyboard_buf_tb;
     reg KB_clear;
     reg [7:0] rx_data;
     reg rx_done;
-    reg KB_status;
-    reg [6:0] KB_data;
-    reg buf_full;
+    wire KB_status;
+    wire [6:0] KB_data;
+    wire buf_full;
     
     localparam period = 50;
     
@@ -45,9 +45,10 @@ module keyboard_buf_tb;
     );
     
    initial begin
-        clk = 1'b0;
+        clk = 1'b1;
         KB_read_en = 1'b0;
-        #period KB_clear = 1'b1;
+        KB_clear = 1'b1;
+        #period KB_clear = 1'b0;
         rx_data = 8'b00000000;
         rx_done = 1'b0;
         forever begin

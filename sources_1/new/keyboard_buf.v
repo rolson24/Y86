@@ -101,8 +101,8 @@ module read_pointer(
     output fifo_read_en);
     
     assign fifo_read_en = (~fifo_empty) & read;
-    always @(posedge clk or negedge reset) begin
-        if(~reset)
+    always @(posedge clk or posedge reset) begin
+        if(reset)
             read_addr <= 5'b00000;
         else if(fifo_read_en)
             read_addr <= read_addr + 5'b00001;
@@ -144,8 +144,8 @@ module write_pointer(
     
     assign fifo_write_en = (~fifo_full) & write;
     
-    always @ (posedge clk or negedge reset) begin
-        if (~reset)
+    always @ (posedge clk or posedge reset) begin
+        if (reset)
             write_addr <= 5'b00000;
         else if (fifo_write_en)
             write_addr <= write_addr + 5'b00001;
