@@ -60,8 +60,18 @@ module keyboard_buf_tb;
     initial begin
         #(5*period);
         KB_read_en = 1'b1;
-        rx_data = 8'h68; // need to figure this out. What is rx data?
+        rx_data = 8'h68; // need to figure this out. RX data is data shifted in from spi reciever and is marked ready with rx_done is high
+        #(2*period);
+        rx_done = 1'b1;
         
+        #period;
+        rx_done = 1'b0;
+        #period;
+        rx_data = 8'h65;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
     end
     
     

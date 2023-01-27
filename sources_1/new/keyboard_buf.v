@@ -32,7 +32,7 @@ module keyboard_buf
     output buf_full
     );
     
-    wire [5:0] write_addr, read_addr; /*extra bit to tell difference between full and empty*/
+    wire [5:0] write_addr, read_addr; /*extra bit to tell difference between full and empty (5 bits for address, most significant 1 for full or empty)*/
     wire fifo_write_en, fifo_read_en;
     wire fifo_empty, fifo_full;
     
