@@ -23,7 +23,7 @@
 module keyboard_buf_tb;
 
     reg clk;
-    reg KB_read_en;
+    reg KB_read_en; // request to send data out
     reg KB_clear;
     reg [7:0] rx_data;
     reg rx_done;
@@ -59,19 +59,154 @@ module keyboard_buf_tb;
     
     initial begin
         #(5*period);
-        KB_read_en = 1'b1;
+        // h
         rx_data = 8'h68; // need to figure this out. RX data is data shifted in from spi reciever and is marked ready with rx_done is high
         #(2*period);
         rx_done = 1'b1;
-        
         #period;
         rx_done = 1'b0;
+        // e
         #period;
         rx_data = 8'h65;
         #(2*period);
         rx_done = 1'b1;
         #period;
         rx_done = 1'b0;
+        // l
+        #period;
+        rx_data = 8'h6c;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // l
+        #period;
+        rx_data = 8'h6c;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // o
+        #period;
+        rx_data = 8'h6f;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // " "
+        #period;
+        rx_data = 8'h20;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // w
+        #period;
+        rx_data = 8'h77;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // o
+        #period;
+        rx_data = 8'h6f;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // r
+        #period;
+        rx_data = 8'h72;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // l
+        #period;
+        rx_data = 8'h6c;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // d
+        #period;
+        rx_data = 8'h64;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        // send out h
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // e
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // l
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // l
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // o
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // " "
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // w
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // o
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // r
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // l
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        // d
+        #(3*period);
+        KB_read_en = 1'b1;
+        #period;
+        KB_read_en = 1'b0;
+        
+        #(3*period); // KB_status should be 0
+        // put in e
+        rx_data = 8'h65;
+        #(2*period);
+        rx_done = 1'b1;
+        #period;
+        rx_done = 1'b0;
+        
+        #period; // KB_status should be 1
+        
+        KB_clear = 1'b1;
+        #period;
+        KB_clear = 1'b0;
+        
+        #period; // KB_status should be 0
+        
     end
     
     
