@@ -37,10 +37,10 @@ module keyboard_buf_tb;
         .clk(clk),
         .KB_read_en(KB_read_en),
         .KB_clear(KB_clear),
-        .rx_data(rx_data),
-        .rx_done(rx_done),
+        .write_data(rx_data),
+        .write(rx_done),
         .KB_status(KB_status),
-        .KB_data(KB_data),
+        .read_data(KB_data),
         .buf_full(buf_full)
     );
     

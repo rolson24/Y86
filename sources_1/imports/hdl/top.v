@@ -19,89 +19,44 @@
 //     Known issue, when multiple buttons are pressed and one is released, the scan code of the one still held down is ometimes re-sent.
 //////////////////////////////////////////////////////////////////////////////////
 
-
+// need to get this to work with ps2_keyboard_to_ascii
 module keyboard_interface_top(         // need to integrate buffer perhaps
     input  clk,     // master clk
-    input  PS2Data, // data from keyboard
-    input  PS2Clk,  // keyboard clk
+    input  PS2_data, // data from keyboard
+    input  PS2_clk,  // keyboard clk
     input  KB_read_en,
     input  KB_clear,    // need to implement clear
-    output KB_status, 
+    output KB_status,   // code read
     output [6:0] KB_data,
     output buf_full    
 );
-    // wire        tready;
-    wire        ready;
-    // wire        tstart;
-    reg         start=0;
-    reg         CLK50MHZ=0;
-    wire [31:0] tbuf;
-    reg  [15:0] keycodev=0;
-    wire [15:0] keycode;
-    wire [ 7:0] tbus;
-    reg  [ 2:0] bcount=0;   // counts for something
-    wire        flag;
-    reg         cn=0;       // control flag?
     
-    assign KB_status = tbus[6:0];
+    wire        ascii_new = 0;
+    wire [6:0]  ascii_data;
     
-    always @(posedge(clk))begin
-        CLK50MHZ<=~CLK50MHZ;
-    end
+    keyboard_buf keyboard_buf(
+        .clk(clk),
+        .KB_read_en(KB_read_en),
+        .KB_clear(KB_clear),
+        .write_data(ascii_data),
+        .write(ascii_new),
+        .KB_status(KB_status),
+        .read_data(KB_data),
+        .buf_full(buf_full)
+    );
     
-    PS2Receiver uut (
-        .clk(CLK50MHZ),
-        .kclk(PS2Clk),
-        .kdata(PS2Data),
-        .keycode(keycode),
-        .oflag(flag)
+    ps2_keyboard_to_ascii #(
+        .clk_freq(50000000),
+        .ps2_debounce_counter_size(8)
+    )
+    ps2_keyboard_to_ascii (
+        .clk(clk),
+        .ps2_clk(PS2_clk),
+        .ps2_data(PS2_data),
+        .ascii_new(ascii_new),
+        .ascii_code(ascii_data)
     );
     
     
-    always@(keycode)
-        if (keycode[7:0] == 8'hf0) begin
-            cn <= 1'b0;
-            bcount <= 3'd0;
-        end else if (keycode[15:8] == 8'hf0) begin
-            cn <= keycode != keycodev;
-            bcount <= 3'd5;
-        end else begin
-            cn <= keycode[7:0] != keycodev[7:0] || keycodev[15:8] == 8'hf0;
-            bcount <= 3'd2;
-        end
-    
-    always@(posedge clk)
-        if (flag == 1'b1 && cn == 1'b1) begin
-            start <= 1'b1;
-            keycodev <= keycode;
-        end else
-            start <= 1'b0;
-    
-    bin2ascii #(
-        .NBYTES(2)
-    ) conv (
-        .I(keycodev),
-        .O(tbuf)
-    );
-    
-    uart_buf_con tx_con (
-        .clk    (clk   ),
-        .bcount (bcount),
-        .tbuf   (tbuf  ),  
-        .start  (start ), 
-        .ready  (ready ), 
-        .tstart (KB_read_en),
-        .tready (KB_status),
-        .tbus   (tbus)
-    );
-    /*
-    uart_tx get_tx (
-        .clk    (clk),
-        .start  (tstart),
-        .tbus   (tbus),
-        .tx     (tx),
-        .ready  (tready)
-    );
-    */
     
 endmodule

@@ -25,10 +25,10 @@ module keyboard_buf
    (input clk,
     input KB_read_en,
     input KB_clear,
-    input [7:0] rx_data,
-    input rx_done,
+    input [6:0] write_data,     // was rx_data
+    input write,
     output KB_status,
-    output [6:0] KB_data,
+    output [6:0] read_data,     // was KB_data
     output buf_full
     );
     
@@ -43,7 +43,7 @@ module keyboard_buf
         .clk(clk),
         .reset(KB_clear),
         .fifo_full(fifo_full),
-        .write(rx_done),
+        .write(write),
         .write_addr(write_addr),
         .fifo_write_en(fifo_write_en));
     read_pointer read_pointer(
@@ -55,15 +55,15 @@ module keyboard_buf
         .fifo_read_en(fifo_read_en));
     memory_array memory(
         .clk(clk),
-        .data_in(rx_data[6:0]),
+        .data_in(write_data),
         .fifo_write_en(fifo_write_en),
         .write_addr(write_addr),
         .read_addr(read_addr),
-        .data_out(KB_data));
+        .data_out(read_data));
     status_signal signals(
         .clk(clk),
         .reset(KB_clear),
-        .write(rx_done),
+        .write(write),
         .read(KB_read_en),
         .fifo_write_en(fifo_write_en),
         .fifo_read_en(fifo_read_en),

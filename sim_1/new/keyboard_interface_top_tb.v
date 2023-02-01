@@ -23,37 +23,64 @@
 module keyboard_interface_top_tb;
     
     reg clk;
+    reg key_clk;
     reg KB_read_en; // request to send data out
     reg KB_clear;
-    reg [7:0] rx_data;
+    reg ps2_data;
     reg rx_done;
     wire KB_status;
     wire [6:0] KB_data;
     wire buf_full;
     
-    localparam period = 50;
-    
+    localparam period = 20;
+    localparam key_period = 100000;   
+     
     keyboard_interface_top UUT (
         .clk(clk),
+        .PS2_clk(key_clk),
+        .PS2_data(ps2_data),
         .KB_read_en(KB_read_en),
         .KB_clear(KB_clear),
-        .rx_data(rx_data),
-        .rx_done(rx_done),
         .KB_status(KB_status),
         .KB_data(KB_data),
         .buf_full(buf_full)
     );
     
-   initial begin
+    initial begin
+        
         clk = 1'b1;
-        KB_read_en = 1'b0;
-        KB_clear = 1'b1;
-        #period KB_clear = 1'b0;
-        rx_data = 8'b00000000;
-        rx_done = 1'b0;
-        forever begin
-            #(period/2) clk = ~clk;
-        end
+        key_clk = 1'b1;
+        ps2_data = 1'b1;
+        #key_period;
     end
-
+    
+    always #(period/2) clk = ~clk;
+    always #(key_period/2) key_clk = ~key_clk;
+    
+    initial
+    begin
+        ps2_data = 1'b0; // start bit
+        #key_period;
+        ps2_data = 1'b0;  // now set ascii h: 68, 0110 1000
+        #key_period;
+        ps2_data = 1'b1;
+        #key_period;
+        ps2_data = 1'b1;
+        #key_period;
+        ps2_data = 1'b0;
+        #key_period;
+        ps2_data = 1'b1;
+        #key_period;
+        ps2_data = 1'b0;
+        #key_period;
+        ps2_data = 1'b0;
+        #key_period;
+        ps2_data = 1'b0;
+        #key_period;
+        ps2_data = 1'b1; // parity: 3 1's so odd = 1
+        #key_period;
+        ps2_data = 1'b1; // stop bit
+        
+    end
+    
 endmodule
