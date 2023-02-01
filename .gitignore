@@ -84,3 +84,6 @@
 !*.elf
 !*.bmm
 !*.xmp
+
+# ignore IP modules
+sources_1/ip/*/
