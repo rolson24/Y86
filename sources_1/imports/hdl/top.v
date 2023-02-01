@@ -20,17 +20,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module top(         // need to integrate buffer perhaps
-    input  clk,     // board clk
-    input  PS2Data, // keyboard data
+module keyboard_interface_top(         // need to integrate buffer perhaps
+    input  clk,     // master clk
+    input  PS2Data, // data from keyboard
     input  PS2Clk,  // keyboard clk
     input  KB_read_en,
     input  KB_clear,    // need to implement clear
-    output KB_status,
+    output KB_status, 
     output [6:0] KB_data,
-    output buf_full
+    output buf_full    
 );
-    //wire        tready;
+    // wire        tready;
     wire        ready;
     // wire        tstart;
     reg         start=0;
@@ -93,7 +93,7 @@ module top(         // need to integrate buffer perhaps
         .tstart (KB_read_en),
         .tready (KB_status),
         .tbus   (tbus)
-    ); 
+    );
     /*
     uart_tx get_tx (
         .clk    (clk),
