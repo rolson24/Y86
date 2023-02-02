@@ -78,8 +78,8 @@ BEGIN
       
         --ready state: wait for a new PS2 code to be received
         WHEN ready =>
+          ascii_new <= '0';                                       --reset new ASCII code indicator
           IF(prev_ps2_code_new = '0' AND ps2_code_new = '1') THEN --new PS2 code received
-            ascii_new <= '0';                                       --reset new ASCII code indicator
             state <= new_code;                                      --proceed to new_code state
           ELSE                                                    --no new PS2 code received yet
             state <= ready;                                         --remain in ready state

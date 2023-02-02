@@ -31,7 +31,7 @@ module keyboard_interface_top(         // need to integrate buffer perhaps
     output buf_full    
 );
     
-    wire        ascii_new = 0;
+    wire        ascii_new;
     wire [6:0]  ascii_data;
     
     keyboard_buf keyboard_buf(
@@ -46,8 +46,8 @@ module keyboard_interface_top(         // need to integrate buffer perhaps
     );
     
     ps2_keyboard_to_ascii #(
-        .clk_freq(50000000),
-        .ps2_debounce_counter_size(8)
+        .clk_freq(),
+        .ps2_debounce_counter_size()
     )
     ps2_keyboard_to_ascii (
         .clk(clk),

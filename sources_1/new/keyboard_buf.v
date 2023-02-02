@@ -97,7 +97,7 @@ module read_pointer(
     input read,
     input fifo_empty,
     input reset,
-    output reg [5:0] read_addr,
+    output reg [5:0] read_addr = 0,
     output fifo_read_en);
     
     assign fifo_read_en = (~fifo_empty) & read;
@@ -120,8 +120,8 @@ module status_signal(
     input reset,
     input [5:0] write_addr,
     input [5:0] read_addr,
-    output reg fifo_full,
-    output reg fifo_empty);
+    output reg fifo_full = 0,
+    output reg fifo_empty = 0);
 
     wire full_bit_compare;
     wire pointer_equal;
@@ -139,7 +139,7 @@ module write_pointer(
     input reset,
     input fifo_full,
     input write,
-    output reg [5:0] write_addr,
+    output reg [5:0] write_addr = 0,
     output fifo_write_en);
     
     assign fifo_write_en = (~fifo_full) & write;
