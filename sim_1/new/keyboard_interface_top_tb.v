@@ -92,6 +92,45 @@ module keyboard_interface_top_tb;
         #(key_period/2) key_clk = ~key_clk;
         ps2_data = 1'b1; // stop bit
         
+        #(3*key_period);
+        KB_read_en = 1'b1;
+        #key_period;
+        KB_read_en = 1'b0;
+        
+        ps2_data = 1'b0; // start bit
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;  // now set ascii h: 33, 0011 0011 least sig first
+        #(key_period/2) key_clk = ~key_clk;   
+        #(key_period/2) key_clk = ~key_clk;     
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; // parity: 4 1's so even = 1
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; // stop bit
+        
+        #(3*key_period);
+        KB_clear = 1'b1;
         
     end
     
