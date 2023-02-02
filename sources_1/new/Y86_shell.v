@@ -22,16 +22,27 @@
 
 module Y86_shell(
         input mclk,
-        input reset,
-        input KB_status,
-        input [6:0] KB_data,
+        input ps2_in,
+        input ps2_clk,
+        //input reset,
+        //input KB_status,
+        //input [6:0] KB_data,
         input TTY_ready,
-        output KB_read_en,
-        output KB_clear,
+        //output KB_read_en,
+        //output KB_clear,
         output [6:0] TTY_data,
         output TTY_en,
         output TTY_clear
     );
+    
+    // keyboard interface
+    wire reset;
+    wire KB_status;
+    wire [6:0] KB_data;
+    wire KB_read_en;
+    wire KB_clear;
+    wire buf_full;
+    
     // clk wires
     wire clk;
     
@@ -615,5 +626,15 @@ module Y86_shell(
     assign I_data_in = data_out_bus;
     assign D_data_from_RAM = data_out_bus;
     
+    keyboard_interface_top keyboard_interface_top (
+        .clk(mclk),
+        .PS2_data(ps2_in),
+        .PS2_clk(ps2_clk),
+        .KB_read_en(KB_read_en),
+        .KB_clear(KB_clear),
+        .KB_status(KB_status),
+        .KB_data(KB_data),
+        .buf_full(buf_full)
+    );
     
 endmodule

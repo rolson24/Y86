@@ -34,6 +34,7 @@ module Y86_shell_tb;
     
     localparam period = 50;
     
+    // update the port map
     Y86_shell DUT(
         .mclk(clk),
         .reset(reset),
@@ -47,7 +48,7 @@ module Y86_shell_tb;
         .TTY_clear(TTY_clear)
     );
     
-    
+    // need to look at instruction rom
     initial begin
         clk = 1'b0;
         TTY_ready = 1'b1;
