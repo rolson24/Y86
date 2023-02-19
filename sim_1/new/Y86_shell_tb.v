@@ -70,45 +70,84 @@ module Y86_shell_tb;
         #(3*period);
         reset = 1'b0;
         #(2*key_period);
-        key_clk = ~key_clk;
         ps2_data = 1'b0; // start bit
+        #(key_period);
+        #(key_period/2) key_clk = ~key_clk; //1
         #(key_period/2) key_clk = ~key_clk;
-        #(key_period/2) key_clk = ~key_clk;
-        ps2_data = 1'b1;  // now set ascii h: 33, 0011 0011 least sig first
-        #(key_period/2) key_clk = ~key_clk;   
+        ps2_data = 1'b1;  // now send keycode h: 0x33, 0011 0011 least sig first
+        #(key_period/2) key_clk = ~key_clk;   //2
         #(key_period/2) key_clk = ~key_clk;     
         ps2_data = 1'b1;
-        #(key_period/2) key_clk = ~key_clk;
-        #(key_period/2) key_clk = ~key_clk;
-        ps2_data = 1'b0;
-        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk; //3
         #(key_period/2) key_clk = ~key_clk;
         ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk; //4 
         #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk; //5 
         #(key_period/2) key_clk = ~key_clk;
         ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk; // 6
         #(key_period/2) key_clk = ~key_clk;
-        #(key_period/2) key_clk = ~key_clk;
-        ps2_data = 1'b1;
-        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; 
+        #(key_period/2) key_clk = ~key_clk; // 7
+        #(key_period/2) key_clk = ~key_clk; 
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk; //8
         #(key_period/2) key_clk = ~key_clk;
         ps2_data = 1'b0;
-        #(key_period/2) key_clk = ~key_clk;
-        #(key_period/2) key_clk = ~key_clk;
-        ps2_data = 1'b0;
-        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk; //9
         #(key_period/2) key_clk = ~key_clk;
         ps2_data = 1'b1; // parity: 4 1's so even = 1
-        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk; //10
         #(key_period/2) key_clk = ~key_clk;
         ps2_data = 1'b1; // stop bit
+        #(key_period/2) key_clk = ~key_clk; //10
+        #(key_period/2) key_clk = ~key_clk;
         
         #(15*key_period);
 
         ps2_data = 1'b0; // start bit
+        #(key_period/2);
         #(key_period/2) key_clk = ~key_clk;
         #(key_period/2) key_clk = ~key_clk;
-        ps2_data = 1'b1;  // now set ascii h: 33, 0011 0011 least sig first
+        ps2_data = 1'b0;  // now send keycode shift: 0x12, 0001 0010 least sig first
+        #(key_period/2) key_clk = ~key_clk;   
+        #(key_period/2) key_clk = ~key_clk;     
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; // parity: 4 1's so even = 1
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; // stop bit
+        #(key_period/2) key_clk = ~key_clk; //10
+        #(key_period/2) key_clk = ~key_clk;
+        
+        #(2*key_period);
+        ps2_data = 1'b0; // start bit
+        #(key_period/2);
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;  // now send keycode h: 0x33, 0011 0011 least sig first
         #(key_period/2) key_clk = ~key_clk;   
         #(key_period/2) key_clk = ~key_clk;     
         ps2_data = 1'b1;
@@ -136,7 +175,8 @@ module Y86_shell_tb;
         #(key_period/2) key_clk = ~key_clk;
         #(key_period/2) key_clk = ~key_clk;
         ps2_data = 1'b1; // stop bit
-        
+        #(key_period/2) key_clk = ~key_clk; //10
+        #(key_period/2) key_clk = ~key_clk;
         
     end
     
