@@ -26,7 +26,7 @@ module dshim_tb;
     reg DMemWrite = 0;
     reg req = 0;
     reg reset = 0;
-    reg clk = 0;
+    reg clk = 1;
     reg [31:0] data_in = 0;
     reg [7:0] data_from_RAM = 0;
     wire RAMuse;
@@ -56,56 +56,44 @@ module dshim_tb;
         .data_out(data_out)
     );
     
+    always #(period/2) clk = ~clk;
+
+    
     initial begin
+    
+        #(2*period);
+        data_from_RAM = 8'h68;
         req = 1;
         #period;
-        clk = 1;
-        #period;
-        clk = 0;
         req = 0;
         #period;
-        clk = 1;
         #period;
-        clk = 0;
+        #period;
+        data_from_RAM = 0;
+
         #period
-        clk = 1;
         #period;
-        clk = 0;
         #period
-        clk = 1;
         #period;
-        clk = 0;
         #period;
         
         #period; // check output here
         
-        clk = 1;
         #period;
-        clk = 0;
         #period;
         
         DMemWrite = 1;
         req = 1;
-        clk = 1;
         #period;
-        clk = 0;
         #period;
-        clk = 1;
         #period;
-        clk = 0;
         #period;
-        clk = 1;
         #period;
-        clk = 0;
         #period;
-        clk = 1;
         #period;
-        clk = 0;
         #period;
         
-        clk = 1;
         #period;
-        clk = 0;
         #period;
         
     end

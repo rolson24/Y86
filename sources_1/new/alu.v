@@ -60,18 +60,19 @@ module alu(
             default : ZSO[0] = 1'b0;
         endcase
     
-    always @ (*)
+    always @ (valE)
         if (valE == 32'h0) begin
             ZSO[2] <= 1;
         end else
             ZSO[2] <= 0;
             
-    always @ (*)
-        if (valE < 0) begin
-            ZSO[1] <= 1;
-        end else
+    always @ (valE)
+        if (valE[31] == 0) begin
             ZSO[1] <= 0;
+        end else
+            ZSO[1] <= 1;
     
+
     always @ (*)
         case (aluOP[1:0])
             2'h0 : valE <= add_out;

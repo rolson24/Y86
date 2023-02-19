@@ -97,15 +97,15 @@ module read_pointer(
     input read,
     input fifo_empty,
     input reset,
-    output reg [5:0] read_addr = 0,
+    output reg [5:0] read_addr = 6'b000000,
     output fifo_read_en);
     
     assign fifo_read_en = (~fifo_empty) & read;
     always @(posedge clk or posedge reset) begin
         if(reset)
-            read_addr <= 5'b00000;
+            read_addr <= 6'b000000;
         else if(fifo_read_en)
-            read_addr <= read_addr + 5'b00001;
+            read_addr <= read_addr + 6'b000001;
         else
             read_addr <= read_addr;
     end
@@ -121,16 +121,18 @@ module status_signal(
     input [5:0] write_addr,
     input [5:0] read_addr,
     output reg fifo_full = 0,
-    output reg fifo_empty = 0);
+    output reg fifo_empty = 1);
 
-    wire full_bit_compare;
+    wire full_bit;
+    wire empty_bit;
     wire pointer_equal;
-    assign full_bit_compare = write_addr[5] ^ read_addr[5];
-    assign pointer_equal = (write_addr[4:0] - read_addr[4:0]) ? 0:1;
+    assign full_bit = write_addr[5] & read_addr[5];
+    assign empty_bit = ~write_addr[5] & ~read_addr[5];
+    assign pointer_equal = ((write_addr[4:0] - (read_addr[4:0]))) ? 0:1;
     
     always @(*) begin
-        fifo_full = full_bit_compare & pointer_equal;
-        fifo_empty = (~full_bit_compare) & pointer_equal;
+        fifo_full = full_bit & pointer_equal;
+        fifo_empty = empty_bit & pointer_equal;
     end
 endmodule
 
@@ -139,16 +141,16 @@ module write_pointer(
     input reset,
     input fifo_full,
     input write,
-    output reg [5:0] write_addr = 0,
+    output reg [5:0] write_addr = 6'b000000,
     output fifo_write_en);
     
     assign fifo_write_en = (~fifo_full) & write;
     
     always @ (posedge clk or posedge reset) begin
         if (reset)
-            write_addr <= 5'b00000;
+            write_addr <= 6'b000000;
         else if (fifo_write_en)
-            write_addr <= write_addr + 5'b00001;
+            write_addr <= write_addr + 6'b000001;
         else
             write_addr <= write_addr;
     end

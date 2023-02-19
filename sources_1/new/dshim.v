@@ -73,13 +73,21 @@ module dshim(
     
     always @ (posedge clk or posedge clear) begin
         if (clear == 1) begin
-            in_use = 0;
             state = 0;
-        end else if (clk) begin
-            if (~in_use)
-                in_use = req;
-            else 
-                state = state + 1;
+        end else if (in_use) begin
+            state = state + 1;
+        end else begin
+            state = state;
+        end
+    end
+    
+    always @ (posedge clk or posedge clear) begin // need to split this into 2 blocks I think state is the issue
+        if (clear == 1) begin
+            in_use = 0;
+        end else if (~in_use) begin
+            in_use = req;
+        end else begin
+            in_use = in_use;
         end
     end
 

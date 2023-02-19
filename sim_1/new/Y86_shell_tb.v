@@ -31,18 +31,24 @@ module Y86_shell_tb;
     wire [6:0] TTY_data;
     wire TTY_en;
     wire TTY_clear;
+    reg ps2_data = 1;
+    reg key_clk = 1;
     
-    localparam period = 50;
+    localparam period = 12.5;
+    localparam key_period = 500000;   
+
     
     // update the port map
     Y86_shell DUT(
         .mclk(clk),
+        .ps2_in(ps2_data),
+        .ps2_clk(key_clk),
         .reset(reset),
-        .KB_status(KB_status),
-        .KB_data(KB_data),
+        //.KB_status(KB_status),
+        //.KB_data(KB_data),
         .TTY_ready(TTY_ready),
-        .KB_read_en(KB_read_en),
-        .KB_clear(KB_clear),
+        //.KB_read_en(KB_read_en),
+        //.KB_clear(KB_clear),
         .TTY_data(TTY_data),
         .TTY_en(TTY_en),
         .TTY_clear(TTY_clear)
@@ -52,11 +58,86 @@ module Y86_shell_tb;
     initial begin
         clk = 1'b0;
         TTY_ready = 1'b1;
-        #period reset = 1'b1;
+        reset = 1'b1;
+    end
+    
+    always #(period/2) clk = ~clk;
+    //always #(key_period/2) key_clk = ~key_clk;
+    
+    initial
+    begin
+        #(period/2);
+        #(3*period);
         reset = 1'b0;
-        forever begin
-            #(period/2) clk = ~clk;
-        end
+        #(2*key_period);
+        key_clk = ~key_clk;
+        ps2_data = 1'b0; // start bit
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;  // now set ascii h: 33, 0011 0011 least sig first
+        #(key_period/2) key_clk = ~key_clk;   
+        #(key_period/2) key_clk = ~key_clk;     
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; // parity: 4 1's so even = 1
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; // stop bit
+        
+        #(15*key_period);
+
+        ps2_data = 1'b0; // start bit
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;  // now set ascii h: 33, 0011 0011 least sig first
+        #(key_period/2) key_clk = ~key_clk;   
+        #(key_period/2) key_clk = ~key_clk;     
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b0;
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; // parity: 4 1's so even = 1
+        #(key_period/2) key_clk = ~key_clk;
+        #(key_period/2) key_clk = ~key_clk;
+        ps2_data = 1'b1; // stop bit
+        
+        
     end
     
     initial begin

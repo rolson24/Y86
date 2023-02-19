@@ -24,7 +24,7 @@ module Y86_shell(
         input mclk,
         input ps2_in,
         input ps2_clk,
-        //input reset,
+        input reset,
         //input KB_status,
         //input [6:0] KB_data,
         input TTY_ready,
@@ -36,7 +36,6 @@ module Y86_shell(
     );
     
     // keyboard interface
-    wire reset;
     wire KB_status;
     wire [6:0] KB_data;
     wire KB_read_en;
@@ -269,10 +268,10 @@ module Y86_shell(
         .addra(currentState),
         .douta(FSM_states)
     );
-    always @ (posedge clk) begin
+    always @ (posedge clk or posedge reset) begin
         if (reset == 1)
             currentState = 0;
-        else if (clk)
+        else if (clk == 1)
             currentState = nextState;
     end
 
@@ -627,7 +626,7 @@ module Y86_shell(
     assign D_data_from_RAM = data_out_bus;
     
     keyboard_interface_top keyboard_interface_top (
-        .clk(mclk),
+        .clk(clk),
         .PS2_data(ps2_in),
         .PS2_clk(ps2_clk),
         .KB_read_en(KB_read_en),
