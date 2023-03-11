@@ -41,7 +41,7 @@ ARCHITECTURE logic OF ps2_keyboard IS
   SIGNAL ps2_data_int : STD_LOGIC;                          --debounced data signal from PS/2 keyboard
   SIGNAL ps2_word     : STD_LOGIC_VECTOR(10 DOWNTO 0);      --stores the ps2 data word
   SIGNAL error        : STD_LOGIC;                          --validate parity, start, and stop bits
-  SIGNAL count_idle   : INTEGER RANGE 0 TO clk_freq/18_000; --counter to determine PS/2 is idle
+  SIGNAL count_idle   : INTEGER RANGE 0 TO clk_freq/9_000; --counter to determine PS/2 is idle
   
   --declare debounce component for debouncing PS2 input signals
   COMPONENT debounce IS
@@ -91,11 +91,11 @@ BEGIN
     
       IF(ps2_clk_int = '0') THEN                 --low PS2 clock, PS/2 is active
         count_idle <= 0;                           --reset idle counter
-      ELSIF(count_idle /= clk_freq/18_000) THEN  --PS2 clock has been high less than a half clock period (<55us)
+      ELSIF(count_idle /= clk_freq/9_000) THEN  --PS2 clock has been high less than a half clock period (<55us)
           count_idle <= count_idle + 1;            --continue counting
       END IF;
       
-      IF(count_idle = clk_freq/18_000 AND error = '0') THEN  --idle threshold reached and no errors detected
+      IF(count_idle = clk_freq/9_000 AND error = '0') THEN  --idle threshold reached and no errors detected
         ps2_code_new <= '1';                                   --set flag that new PS/2 code is available
         ps2_code <= ps2_word(8 DOWNTO 1);                      --output new PS/2 code
       ELSE                                                   --PS/2 port active or error detected

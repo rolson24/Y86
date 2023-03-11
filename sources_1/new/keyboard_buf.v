@@ -112,11 +112,11 @@ module read_pointer(
 endmodule
 
 module status_signal(
-    input write,
+    input clk,
     input read,
+    input write,
     input fifo_write_en,
     input fifo_read_en,
-    input clk,
     input reset,
     input [5:0] write_addr,
     input [5:0] read_addr,

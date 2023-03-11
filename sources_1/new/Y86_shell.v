@@ -21,7 +21,7 @@
 
 
 module Y86_shell(
-        input mclk,
+        input SYS_CLK,
         input ps2_in,
         input ps2_clk,
         input reset,
@@ -43,7 +43,9 @@ module Y86_shell(
     wire buf_full;
     
     // clk wires
-    wire clk;
+    wire clk_200MHz;
+    wire clk_50MHz;
+    wire locked;
     
     // FSM wires
     wire [31:0] FSM_controls;
@@ -211,18 +213,29 @@ module Y86_shell(
     wire in_range;
     
     // Clock divider
-    Clock_divider clk_div(
-        .clock_in(mclk),
-        .clock_out(clk)
-    );
+//    Clock_divider clk_div(
+//        .clock_in(mclk),
+//        .clock_out(clk)
+//    );
     /*buffg gbuff_for_mux(
         .out(clk), 
         .in(mclk)
     ); */
+    
+    // MMCM
+    clk_wiz_0 MMCM(
+        .clk_in1(SYS_CLK),
+        .clk_200MHz(clk_200MHz),
+        .clk_50MHz(clk_50MHz),
+        .reset(reset),
+        .locked(locked)
+    );
+    
 
     // state machine logic
+    (* DONT_TOUCH = "yes" *)
     FSM_control_ROM control_ROM(
-        .clka(mclk),
+        .clka(clk_200MHz),
         .addra(currentState),
         .douta(FSM_controls)
     );
@@ -253,6 +266,7 @@ module Y86_shell(
     assign newPCsel = FSM_controls[10:9];
     assign IdPC = FSM_controls[8];
     
+    (* DONT_TOUCH = "yes" *)
     microsequencer useq(
         .currentState(currentState),
         .select(FSM_states[11:10]),
@@ -263,23 +277,24 @@ module Y86_shell(
         .nextState(nextState)
     );
     
+    (* DONT_TOUCH = "yes" *)
     FSM_next_states FSM_next_states(
-        .clka(mclk),
+        .clka(clk_200MHz),
         .addra(currentState),
         .douta(FSM_states)
     );
-    always @ (posedge clk or posedge reset) begin
+    always @ (posedge clk_50MHz or posedge reset) begin
         if (reset == 1)
             currentState = 0;
-        else if (clk == 1)
+        else if (clk_50MHz == 1)
             currentState = nextState;
     end
 
     // PC register logic
-    always @ (posedge clk or posedge reset) begin
+    always @ (posedge clk_50MHz or posedge reset) begin
         if (reset == 1) begin
             PC = 0;
-        end else if (clk == 1 & IdPC == 1) begin
+        end else if (clk_50MHz == 1 & IdPC == 1) begin
             PC = newPC;
         end 
     end
@@ -305,6 +320,7 @@ module Y86_shell(
     end
     
     // CND logic
+    (* DONT_TOUCH = "yes" *)
     CND CND_i(
         .ZSO(CC),
         .ifun(ifun),
@@ -312,12 +328,12 @@ module Y86_shell(
     );
     
     // ishim logic
-    
+//    (* DONT_TOUCH = "yes" *)
     ishim ishim_i(
         .req(IMemReq),
         .addr(PC),
         .reset(reset),
-        .clk(clk),
+        .clk(clk_50MHz),
         .data_from_RAM(I_data_in),
         .RAMuse(I_RAM_use),
         .RAMread(I_RAM_read),
@@ -331,6 +347,7 @@ module Y86_shell(
         .byte5(B5)
     );
     
+    (* DONT_TOUCH = "yes" *)
     isplit isplit_i(
         .B0(B0),
         .B1(B1),
@@ -361,6 +378,7 @@ module Y86_shell(
     assign dstM = rA;
     assign reqM = dstMreq;
     
+    (* DONT_TOUCH = "yes" *)
     regWriter regWriter_i(
         .dstE(dstE),
         .reqE(reqE),
@@ -387,63 +405,63 @@ module Y86_shell(
     );
     
     // main register logic
-    always @ (posedge clk or posedge reset_regs[0]) begin
+    always @ (posedge clk_50MHz or posedge reset_regs[0]) begin
         if (reset_regs[0])
             eax <= 0;
         else if (eax_en)
             eax <= eax_in;
     end
-    always @ (posedge clk or posedge reset_regs[1]) begin
+    always @ (posedge clk_50MHz or posedge reset_regs[1]) begin
         if (reset_regs[1]) begin
             ecx <= 0;
         end else if (ecx_en) begin
             ecx <= ecx_in;
         end
     end
-    always @ (posedge clk or posedge reset_regs[2]) begin
+    always @ (posedge clk_50MHz or posedge reset_regs[2]) begin
         if (reset_regs[2]) begin
             edx <= 0;
-        end else if (clk & edx_en) begin
+        end else if (clk_50MHz & edx_en) begin
             edx <= edx_in;
         end
     end
-    always @ (posedge clk or posedge reset_regs[3]) begin
+    always @ (posedge clk_50MHz or posedge reset_regs[3]) begin
 
         if (reset_regs[3]) begin
             ebx <= 0;
-        end else if (clk & ebx_en) begin
+        end else if (clk_50MHz & ebx_en) begin
             ebx <= ebx_in;
         end
     end
-    always @ (posedge clk or posedge reset_regs[4]) begin
+    always @ (posedge clk_50MHz or posedge reset_regs[4]) begin
 
         if (reset_regs[4]) begin
             esp <= 0;
-        end else if (clk & esp_en) begin
+        end else if (clk_50MHz & esp_en) begin
             esp <= esp_in;
         end
     end
-    always @ (posedge clk or posedge reset_regs[5]) begin
+    always @ (posedge clk_50MHz or posedge reset_regs[5]) begin
 
         if (reset_regs[5]) begin
             ebp <= 0;
-        end else if (clk & ebp_en) begin
+        end else if (clk_50MHz & ebp_en) begin
             ebp <= ebp_in;
         end
     end
-    always @ (posedge clk or posedge reset_regs[6]) begin
+    always @ (posedge clk_50MHz or posedge reset_regs[6]) begin
 
         if (reset_regs[6]) begin
             esi <= 0;
-        end else if (clk & esi_en) begin
+        end else if (clk_50MHz & esi_en) begin
             esi <= esi_in;
         end
     end
-    always @ (posedge clk or posedge reset_regs[7]) begin
+    always @ (posedge clk_50MHz or posedge reset_regs[7]) begin
 
         if (reset_regs[7]) begin
             edi <= 0;
-        end else if (clk & edi_en) begin
+        end else if (clk_50MHz & edi_en) begin
             edi <= edi_in;
         end
     end
@@ -452,6 +470,7 @@ module Y86_shell(
     assign srcA = srcAsel ? 4 : rA;
     assign srcBfull = srcBsel ? 4 : rB;
     assign srcB = srcBfull[2:0];
+    (* DONT_TOUCH = "yes" *)
     regReader regReader_i(
         .reset(reset),
         .srcA(srcA),
@@ -482,7 +501,7 @@ module Y86_shell(
     assign srcBf = (srcBfull == 'hf);
     assign aluB = (aluBsel | srcBf) ? 0 : valB;
     assign aluOP = aluOPsel ? ifun : 0;
-    
+    (* DONT_TOUCH = "yes" *)
     alu alu_i(
         .aluA(aluA),
         .aluB(aluB),
@@ -492,38 +511,38 @@ module Y86_shell(
     );
     
     // CC reg logic
-    always @ (posedge clk or posedge reset) begin
+    always @ (posedge clk_50MHz or posedge reset) begin
         if (reset == 1) begin
             CC = 0;
-        end else if (clk == 1 & IdCC == 1) begin
+        end else if (clk_50MHz == 1 & IdCC == 1) begin
             CC = ZSO;
         end
     end
     
     // dshim logic
     // MDR reg logic
-    always @ (posedge clk or posedge reset) begin
+    always @ (posedge clk_50MHz or posedge reset) begin
         if (reset == 1) begin
             MDR = 0;
-        end else if (clk == 1 & IdMDR == 1) begin
+        end else if (clk_50MHz == 1 & IdMDR == 1) begin
             MDR = MDRsel ? valP : valA;
         end
     end
     // MAR reg logic
-    always @ (posedge clk or posedge reset) begin
+    always @ (posedge clk_50MHz or posedge reset) begin
         if (reset == 1) begin
             MAR = 0;
-        end else if (clk == 1 & IdMAR == 1) begin
+        end else if (clk_50MHz == 1 & IdMAR == 1) begin
             MAR = MARsel ? valA : valE;
         end
     end
-    
+    (* DONT_TOUCH = "yes" *)
     dshim dshim_i(
         .addr(MAR),
         .DMemWrite(DMemWrite),
         .req(DMemReq),
         .reset(reset),
-        .clk(clk),
+        .clk(clk_50MHz),
         .data_in(MDR),
         .data_from_RAM(D_data_from_RAM),
         .RAMuse(D_RAM_use),
@@ -538,6 +557,7 @@ module Y86_shell(
 
     
     // RAM logic
+    (* DONT_TOUCH = "yes" *)
     RAM_logic RAM_logic_i(
         .IRAMuse(I_RAM_use),
         .DataRAMuse(D_RAM_use),
@@ -549,6 +569,7 @@ module Y86_shell(
         .RAMRead(RAMread)
     );
     // kbyte buddy
+    (* DONT_TOUCH = "yes" *)
     kbyte_buddy I_kb_buddy(
         .addr(addr_bus),
         .addrPrefix(0),
@@ -556,9 +577,9 @@ module Y86_shell(
         .ramAddr(I_addr),
         .sel(I_use)
     );
-    
+    (* DONT_TOUCH = "yes" *)
     I_ROM Instruction_ROM(
-        .clka(mclk),
+        .clka(clk_200MHz),
         .addra(I_addr),
         .douta(I_data)
     );
@@ -572,8 +593,9 @@ module Y86_shell(
     end
     
     // Data RAM
+    (* DONT_TOUCH = "yes" *)
     Data_RAM RAM(
-        .clka(mclk),
+        .clka(clk_200MHz),
         .wea(write_en),
         .addra(D_addr),
         .dina(D_data_to_RAM),
@@ -581,6 +603,7 @@ module Y86_shell(
     );
     
     // kbyte buddy
+    (* DONT_TOUCH = "yes" *)
     kbyte_buddy D_kb_buddy(
         .addr(addr_bus),
         .addrPrefix(32'h0000f000),
@@ -603,6 +626,7 @@ module Y86_shell(
     end
     
     // IO logic
+    (* DONT_TOUCH = "yes" *)
     IO IO_i(
         .RAM_use(RAMuse),
         .addr(addr_bus),
@@ -624,9 +648,9 @@ module Y86_shell(
 
     assign I_data_in = data_out_bus;
     assign D_data_from_RAM = data_out_bus;
-    
+    (* DONT_TOUCH = "yes" *)
     keyboard_interface_top keyboard_interface_top (
-        .clk(clk),
+        .clk(clk_50MHz),
         .PS2_data(ps2_in),
         .PS2_clk(ps2_clk),
         .KB_read_en(KB_read_en),

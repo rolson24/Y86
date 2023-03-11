@@ -34,13 +34,13 @@ module Y86_shell_tb;
     reg ps2_data = 1;
     reg key_clk = 1;
     
-    localparam period = 12.5;
-    localparam key_period = 500000;   
+    localparam period = 5;
+    localparam key_period = 50000;   
 
     
     // update the port map
     Y86_shell DUT(
-        .mclk(clk),
+        .SYS_CLK(clk),
         .ps2_in(ps2_data),
         .ps2_clk(key_clk),
         .reset(reset),
