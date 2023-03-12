@@ -30,10 +30,21 @@ module Y86_shell(
         input TTY_ready,
         //output KB_read_en,
         //output KB_clear,
+        output ps2_data_debug,
+        output ps2_clk_debug,
+        output [7:0] eax_out_debug,
+        //output [1:0] ecx_out_debug,
+        output TTY_ready_debug,
         output [6:0] TTY_data,
         output TTY_en,
-        output TTY_clear
+        output TTY_clear,
+        output TxD
     );
+    
+    // debugging
+    assign ps2_clk_debug = ps2_clk;
+    assign ps2_data_debug = ps2_in;
+    assign TTY_ready_debug = TTY_ready;
     
     // keyboard interface
     wire KB_status;
@@ -41,6 +52,10 @@ module Y86_shell(
     wire KB_read_en;
     wire KB_clear;
     wire buf_full;
+    
+    wire [6:0] TTY_data_int;
+    reg [7:0] TTY_data_reg = 0;
+    reg TTY_en_delay = 0;
     
     // clk wires
     wire clk_200MHz;
@@ -177,6 +192,9 @@ module Y86_shell(
     wire [2:0] srcB;
     wire [3:0] srcBfull;
     //wire reset; maybe can just wire in
+    assign eax_out_debug = eax[7:0];
+    //assign ecx_out_debug = ecx[1:0];
+
     
     // alu
     reg [31:0] aluA;
@@ -283,6 +301,7 @@ module Y86_shell(
         .addra(currentState),
         .douta(FSM_states)
     );
+    // don't worry about hold timing everything else runs off slow clock besides memory
     always @ (posedge clk_50MHz or posedge reset) begin
         if (reset == 1)
             currentState = 0;
@@ -489,6 +508,7 @@ module Y86_shell(
     );
     
     // alu logic
+    // Need to pipeline!!!! You should start this soon
     always @ (*) begin
         case (aluAsel)
             2'h0 : aluA = valA;
@@ -640,11 +660,25 @@ module Y86_shell(
         .KB_read_en(KB_read_en),
         .KB_clear(KB_clear),
         .TTY_ready(TTY_ready),
-        .TTY_data(TTY_data),
+        .TTY_data(TTY_data_int),
         .TTY_en(TTY_en),
         .TTY_clear(TTY_clear),
         .in_range(in_range)
     );
+    always @ (posedge clk_50MHz) begin
+        if (TTY_en) begin
+            TTY_data_reg = {1'b0, TTY_data_int};
+        end
+    end
+    reg TTY_en_delay_2 = 0;
+    always @ (posedge clk_50MHz) begin
+        TTY_en_delay = TTY_en;
+    end
+    
+    always @ (posedge clk_50MHz) begin
+        TTY_en_delay_2 = TTY_en_delay;
+    end
+    assign TTY_data = TTY_data_reg;
 
     assign I_data_in = data_out_bus;
     assign D_data_from_RAM = data_out_bus;
@@ -658,6 +692,15 @@ module Y86_shell(
         .KB_status(KB_status),
         .KB_data(KB_data),
         .buf_full(buf_full)
+    );
+    
+    (* DONT_TOUCH = "yes" *)
+    transmitter transmitter (
+        .clk(clk_50MHz),
+        .reset(reset),
+        .transmit(TTY_en_delay_2),
+        .data(TTY_data_reg),
+        .TxD(TxD)
     );
     
 endmodule
