@@ -69,7 +69,7 @@ begin
        end
     else begin
          counter <= counter + 1; //counter for baud rate generator start counting 
-            if (counter >= 260) //if count to 2604 (from 0 to 2603)
+            if (counter >= 2603) //if count to 2604 (from 0 to 2603)
                begin 
                   state <= nextstate; //previous state change to next state
                   counter <=0; // reset couter to 0
